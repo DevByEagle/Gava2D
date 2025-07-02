@@ -1,14 +1,14 @@
-import org.gradle.external.javadoc.StandardJavadocDocletOptions
-
 plugins {
     `java-library`
 }
 
 group = "org.gava"
-version = "1.0.0"
+version = "1.0.0-SNAPSHOT"
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
     withSourcesJar()
     withJavadocJar()
 }
@@ -17,13 +17,18 @@ repositories {
     mavenCentral()
 }
 
-tasks.withType<Jar> {
-    manifest.attributes["Implementation-Title"] = "Gava2D"
-    manifest.attributes["Implementation-Version"] = version
+tasks.withType<Javadoc>().configureEach {
+    options.encoding = "UTF-8"
+    (options as StandardJavadocDocletOptions).apply {
+        addStringOption("Xdoclint:none,-missing", "-quiet")
+    }
 }
 
-tasks.withType<Javadoc>().configureEach {
-    (options as StandardJavadocDocletOptions).apply {
-        addStringOption("Xdoclint:none", "-quiet") // Disable doclint warnings
+tasks.jar {
+    manifest {
+        attributes(
+            "Implementation-Title" to "Gava2D",
+            "Implementation-Version" to project.version
+        )
     }
 }
